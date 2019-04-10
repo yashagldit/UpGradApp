@@ -1,6 +1,7 @@
 package com.upgrad.internshipapp;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -119,13 +120,16 @@ public class UserInterest extends AppCompatActivity {
         }
     }
     public void submit(View view){
-
-        Log.v("Selected" ,tagsAdapter.getSelCount()+"");
-        ArrayList<Tags> arrayList1=tagsHelper.getAllTags();
-        for(int i=0; i<arrayList1.size();i++) {
-            if(arrayList1.get(i).getSelected().equals("YES"))
-            Log.v("Items - ", arrayList1.get(i).getName());
+        int sel=tagsAdapter.getSelCount();
+        if(sel<4){
+            Toast.makeText(UserInterest.this,"Please Select more items",Toast.LENGTH_SHORT).show();
         }
+        else{
+            SharedPreferenceUtils sharedPreferenceUtils=new SharedPreferenceUtils(UserInterest.this,"auth");
+            sharedPreferenceUtils.setValue("sel","yes");
+            startActivity(new Intent(UserInterest.this,MainActivity.class));
+        }
+
     }
 
 }

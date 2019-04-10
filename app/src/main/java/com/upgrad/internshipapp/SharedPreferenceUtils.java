@@ -42,6 +42,7 @@ public class SharedPreferenceUtils {
     public void setValue(String key, String value) {
         mSharedPreferencesEditor.putString(key, value);
         mSharedPreferencesEditor.commit();
+        mSharedPreferencesEditor.apply();
     }
 
     /**

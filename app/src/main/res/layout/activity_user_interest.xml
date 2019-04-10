@@ -19,8 +19,9 @@
         android:layout_height="wrap_content"
         android:id="@+id/submit"
         android:text="Submit"
+        android:background="@android:color/holo_blue_dark"
         android:onClick="submit"
-        android:backgroundTint="@android:color/holo_blue_dark"
+
         android:layout_alignParentBottom="true"
         />
 </RelativeLayout>
