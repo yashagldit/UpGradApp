@@ -15,5 +15,8 @@ public class MainActivity extends AppCompatActivity {
         if(tok.equals("")){
             startActivity(new Intent(MainActivity.this ,Login.class));
         }
+        else{
+            startActivity(new Intent(MainActivity.this ,UserInterest.class));
+        }
     }
 }

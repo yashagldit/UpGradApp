@@ -76,7 +76,7 @@ public class Login extends AppCompatActivity {
             Log.v("Access Token",ab);
             Toast.makeText(Login.this,"Logged In",Toast.LENGTH_SHORT).show();
             sharedPreferenceUtils.setValue("token",ab);
-            startActivity(new Intent(Login.this,MainActivity.class));
+            startActivity(new Intent(Login.this,UserInterest.class));
 
         }
     }
