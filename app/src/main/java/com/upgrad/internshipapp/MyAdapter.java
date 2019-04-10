@@ -28,14 +28,11 @@ public class MyAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         switch (position) {
             case 0:
-                QuestionsFragment homeFragment = QuestionsFragment.newInstance(tag,"activity");
-                return homeFragment;
+                return QuestionsFragment.newInstance(tag,"activity");
             case 1:
-                QuestionsFragment homeFragment2 = QuestionsFragment.newInstance(tag,"hot");
-                return homeFragment2;
+                return QuestionsFragment.newInstance(tag,"hot");
             case 2:
-                QuestionsFragment homeFragment3 = QuestionsFragment.newInstance(tag,"offline");
-                return homeFragment3;
+                return QuestionsFragmentOffline.newInstance(tag,"offline");
             default:
                 return null;
         }

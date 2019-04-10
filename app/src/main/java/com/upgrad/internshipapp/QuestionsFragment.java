@@ -59,20 +59,24 @@ public class QuestionsFragment extends Fragment {
     public QuestionsFragment() {
         // Required empty public constructor
     }
+    static String url="";
+    static String tags,type;
 
-
-    public static QuestionsFragment newInstance(String tags,String type) {
+    public static QuestionsFragment newInstance(String tags1,String type1) {
         QuestionsFragment fragment = new QuestionsFragment();
 
         Bundle args = new Bundle();
-        args.putString("tags", tags);
-        args.putString("type", type);
+        args.putString("tags", tags1);
+        args.putString("type", type1);
+        tags=tags1;
+        type=type1;
+        url="https://api.stackexchange.com/2.2/questions?order=desc&sort="+type+"&tagged="+tags+"&site=stackoverflow";
+
 
         fragment.setArguments(args);
         return fragment;
     }
-    String url="";
-    String tags,type;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -121,8 +125,8 @@ public class QuestionsFragment extends Fragment {
         tagsHelper=new TagsHelper(getActivity());
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         SharedPreferenceUtils sharedPreferenceUtils1=new SharedPreferenceUtils(getContext(),"ques");
-        tags=sharedPreferenceUtils1.getStringValue("tag","");
-        Toast.makeText(getContext(),"Tag - "+tags,Toast.LENGTH_SHORT).show();
+        //tags=sharedPreferenceUtils1.getStringValue("tag","");
+       // Toast.makeText(getContext(),"Tag - "+tags,Toast.LENGTH_SHORT).show();
         url="https://api.stackexchange.com/2.2/questions?order=desc&sort="+type+"&tagged="+tags+"&site=stackoverflow";
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -146,6 +150,21 @@ public class QuestionsFragment extends Fragment {
         });
         display();
     }
+    interface SendMessage {
+        void sendData(String message);
+    }
+    SendMessage SM;
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        try {
+            SM = (SendMessage) getActivity();
+        } catch (ClassCastException e) {
+            throw new ClassCastException("Error in retrieving data. Please try again");
+        }
+    }
+
 
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager
@@ -156,13 +175,13 @@ public class QuestionsFragment extends Fragment {
 
     public void display(){
         //events=eventsHelper.getAllEvents();
-        Log.v("Ada dis called",questions.size()+"");
         questionsAdapter=new QuestionsAdapter(questions,getActivity(),recyclerView);
         recyclerView.setAdapter(questionsAdapter);
     }
     public void load(){
 
         if(isNetworkAvailable()) {
+            refreshLayout.setRefreshing(true);
             SharedPreferences sharedPreferences = getActivity().getSharedPreferences("user", MODE_PRIVATE);
            // String url = "https://api.stackexchange.com/2.2/questions?order=desc&sort=activity&tagged=python&site=stackoverflow";
 
@@ -228,19 +247,19 @@ public class QuestionsFragment extends Fragment {
                 //   Log.v("PREPAP","sdjfhjhbd");
                 String own="",pic="";
                 JSONObject JO= jsonArray.getJSONObject(count);
-//                JSONObject jj=jsonObject.getJSONObject("items");
-//                JSONArray owner=jj.getJSONArray("owner");
-//                for(int j=0;j<owner.length();j++){
-//                    JSONObject Own= owner.getJSONObject(j);
-//                    own=Own.getString("display_name");
-//                    pic=Own.getString("profile_image");
-//                }
+                JSONObject jj=JO.getJSONObject("owner");
+                //JSONArray owner=JO.getJSONArray("owner");
+                JSONArray tg=JO.getJSONArray("tags");
+                own=jj.getString("display_name");
+                pic=jj.getString("profile_image");
                 String id=JO.getString("question_id");
                 String title=JO.getString("title");
                 String link=JO.getString("link");
-
                 String dtime=JO.getString("creation_date");
-                String tags=JO.getString("tags");
+                String tags="";
+                for(int i=0;i<tg.length();i++){
+                    tags+=tg.getString(i)+", ";
+                }
 
 
 
@@ -255,5 +274,11 @@ public class QuestionsFragment extends Fragment {
         catch (JSONException e){
             e.printStackTrace();
         }
+    }
+    protected void displayReceivedData(String message,String ty)
+    {
+        url="https://api.stackexchange.com/2.2/questions?order=desc&sort="+ty+"&tagged="+message+"&site=stackoverflow";
+        Log.v("data rec",message);
+        load();
     }
 }

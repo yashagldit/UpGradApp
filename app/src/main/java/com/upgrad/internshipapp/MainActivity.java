@@ -1,9 +1,15 @@
 package com.upgrad.internshipapp;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -18,7 +24,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements  QuestionsFragment.SendMessage{
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
     TagsHelper tagsHelper;
@@ -26,7 +32,6 @@ public class MainActivity extends AppCompatActivity {
     String ctag="";
     MyAdapter adapter;
     ViewPager viewPager;
-
     TabLayout tabLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,9 +43,11 @@ public class MainActivity extends AppCompatActivity {
         String sel=sharedPreferenceUtils.getStringValue("sel","no");
         if(tok.equals("")){
             startActivity(new Intent(MainActivity.this ,Login.class));
+            finish();
         }
-        if(sel.equals("no")){
+        else if(sel.equals("no")){
             startActivity(new Intent(MainActivity.this ,UserInterest.class));
+            finish();
         }
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolba);
@@ -50,10 +57,12 @@ public class MainActivity extends AppCompatActivity {
         viewPager = (ViewPager) findViewById(R.id.viewpager1);
 
         tabLayout = (TabLayout) findViewById(R.id.tabs1);
-        tabLayout.addTab(tabLayout.newTab().setText("Home"));
-        tabLayout.addTab(tabLayout.newTab().setText("Hot"));
-        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
-
+      //  if(isNetworkAvailable()) {
+            tabLayout.addTab(tabLayout.newTab().setText("Home"));
+            tabLayout.addTab(tabLayout.newTab().setText("Hot"));
+            tabLayout.addTab(tabLayout.newTab().setText("Offline"));
+            tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+      //  }
 
 
         tabLayout.setupWithViewPager(viewPager);
@@ -68,8 +77,10 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
+
         adapter = new MyAdapter(this,getSupportFragmentManager(), tabLayout.getTabCount(),ctag);
         viewPager.setAdapter(adapter);
+
         final SharedPreferenceUtils sharedPreferenceUtils1=new SharedPreferenceUtils(MainActivity.this,"ques");
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -78,12 +89,12 @@ public class MainActivity extends AppCompatActivity {
 
                 //Checking if the item is in checked state or not, if not make it in checked state
                 String a=menuItem.toString();
-                reload(a);
+                //reload(a);
                 Log.v("Menu sel",a);
                 sharedPreferenceUtils1.setValue("tag",a);
                 //Closing drawer on item click
                 drawerLayout.closeDrawers();
-
+                sendData(a);
 
                 return true;
 
@@ -117,14 +128,24 @@ public class MainActivity extends AppCompatActivity {
     protected boolean isNavDrawerOpen() {
         return drawerLayout != null && drawerLayout.isDrawerOpen(GravityCompat.START);
     }
-    void reload(String tag){
-
-        MyAdapter adapter2 = new MyAdapter(this,getSupportFragmentManager(), tabLayout.getTabCount(),tag);
-        viewPager.setAdapter(adapter2);
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null;
     }
     protected void closeNavDrawer() {
         if (drawerLayout != null) {
             drawerLayout.closeDrawer(GravityCompat.START);
         }
+    }
+    @Override
+    public void sendData(String message) {
+        String tag = "android:switcher:" + R.id.viewpager1 + ":" + 1;
+        QuestionsFragment f = (QuestionsFragment) getSupportFragmentManager().findFragmentByTag(tag);
+        f.displayReceivedData(message,"activity");
+        String tag2 = "android:switcher:" + R.id.viewpager1 + ":" + 0;
+        QuestionsFragment f2 = (QuestionsFragment) getSupportFragmentManager().findFragmentByTag(tag2);
+        f2.displayReceivedData(message,"hot");
     }
 }

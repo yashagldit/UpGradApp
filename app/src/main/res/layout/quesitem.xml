@@ -13,7 +13,7 @@
         android:layout_height="wrap_content">
 
         <LinearLayout
-            android:id="@+id/eventitemlay"
+            android:id="@+id/quesitemlay"
 
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -76,6 +76,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="dfjkldfgjfg"
+                            android:maxLines="1"
                             android:id="@+id/qtags"
                             android:gravity="end"/>
                     </LinearLayout>
